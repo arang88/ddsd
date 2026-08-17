@@ -267,16 +267,22 @@ function filterDashboard(q){const query=q.toLowerCase().trim();const info=docume
 function openAddArticle(t){window._addTarget=t;document.getElementById('addArticleTarget').textContent=t;openModal('addArticle')}
 
 function addArticle(){
-const nEl=document.getElementById('addArticleName'),uEl=document.getElementById('addArticleUrl');
-const name=nEl.value.trim(),url=uEl.value.trim();
+var nEl=document.getElementById('addArticleName'),uEl=document.getElementById('addArticleUrl');
+var name=nEl.value.trim(),url=uEl.value.trim();
 if(!name){showToast('Enter article name');nEl.focus();return}
 if(!url){showToast('Enter article URL');uEl.focus();return}
-const t=window._addTarget;
-const sec=dashSections.find(s=>s.title===t);
+var t=window._addTarget;
+var sec=dashSections.find(function(s){return s.title===t});
 if(!sec)return;
-if(sec.items.some(a=>a.name.toLowerCase()===name.toLowerCase())){showToast('Article already exists');return}
-sec.items.push({name,url});
+if(sec.items.some(function(a){return a.name.toLowerCase()===name.toLowerCase()})){showToast('Article already exists');return}
+sec.items.push({name:name,url:url});
 saveItems(t,sec.items);
+renderDashboard();
+nEl.value='';uEl.value='';
+closeModal('addArticle');
+showToast('✅ Article added!');
+}
+
 renderDashboard();
 document.getElementById('footerYear').textContent=new Date().getFullYear();
 // LOAD FROM FIREBASE
