@@ -282,25 +282,23 @@ document.getElementById('footerYear').textContent=new Date().getFullYear();
 // LOAD FROM FIREBASE
 function loadFirebase(){
 db.collection('articles').get().then(function(snapshot){
-let updated=false;
+var updated=false;
 snapshot.forEach(function(doc){
-const data=doc.data();
-const docId=doc.id;
-for(const title of Object.keys(addableColumns)){
-const cfg=addableColumns[title];
+var data=doc.data();
+var docId=doc.id;
+var keys=Object.keys(addableColumns);
+for(var i=0;i<keys.length;i++){
+var title=keys[i];
+var cfg=addableColumns[title];
 if(cfg.key===docId&&data.items&&data.items.length>0){
-const sec=dashSections.find(s=>s.title===title);
+var sec=dashSections.find(function(s){return s.title===title});
 if(sec){sec.items=data.items;updated=true}
 }}});
 if(updated)renderDashboard();
 }).catch(function(e){console.log('Firebase load error:',e)});
 }
-loadFirebase();
+setTimeout(loadFirebase,1000);
 
-// Generate permanent code
-const safeName=name.replace(/'/g,"\\'");
-const safeUrl=url.replace(/'/g,"\\'");
-const codeLine="{name:'"+safeName+"',url:'"+safeUrl+"'}";
 
 // Show code to copy
 nEl.value='';uEl.value='';
