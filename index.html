@@ -184,6 +184,8 @@ background-size:60px 60px,60px 60px,120px 120px,120px 120px;animation:gridMove 3
 #circuitCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:0.6}
 
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="circuit-bg"></div>
@@ -248,12 +250,15 @@ Letak sebelum <code style="background:var(--bg-input);padding:1px 4px;border-rad
 
 <div class="toast" id="toast"></div>
 <script>
+// FIREBASE
+firebase.initializeApp({apiKey:"AIzaSyB373RcBAIJmpE9Nh9RsfgIpk9kQgRZzXk",authDomain:"ddsd-console.firebaseapp.com",projectId:"ddsd-console",storageBucket:"ddsd-console.firebasestorage.app",messagingSenderId:"55006933043",appId:"1:55006933043:web:10d6fd8c512b4286f6b346"});
+const db=firebase.firestore();
 const copySvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 const delSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
 const MAX_VISIBLE=6;
 const addableColumns={'MY IT Article':{key:'myitArticles',defaults:[{name:'Lost or Stolen PC Assets',url:'https://myit.dell.com/article/lost-stolen'},{name:'BeyondTrust Privilege Management',url:'https://myit.dell.com/article/beyondtrust'},{name:'Escalate an Incident via My IT',url:'https://myit.dell.com/article/escalate-incident'},{name:'Contact IT',url:'https://myit.dell.com/article/contact-it'},{name:'IT Service Desk - Worldwide Phone Contact',url:'https://myit.dell.com/article/worldwide-phone'},{name:'Working from Home: Evaluate your Network Status',url:'https://myit.dell.com/article/wfh-network'}]},'MY IT Article - Self Healer':{key:'selfHealerArticles',defaults:[{name:'Self Healer',url:'https://myit.dell.com/article/self-healer'},{name:'SHIR - Reimage',url:'https://myit.dell.com/article/shir-reimage'}]},'MY IT Article - Knowledge':{key:'knowledgeArticles',defaults:[{name:'Additional Knowledge Articles',url:'https://myit.dell.com/article/additional-knowledge'}]},'MYIT Article - Resources':{key:'resourceArticles',defaults:[{name:'Additional Resources',url:'https://myit.dell.com/article/additional-resources'}]}};
 function getSavedItems(t){const c=addableColumns[t];if(!c)return null;const s=localStorage.getItem(c.key);if(s){try{return JSON.parse(s)}catch(e){}}return[...c.defaults]}
-function saveItems(t,i){const c=addableColumns[t];if(c)localStorage.setItem(c.key,JSON.stringify(i))}
+function saveItems(t,i){const c=addableColumns[t];if(c){localStorage.setItem(c.key,JSON.stringify(i));db.collection('articles').doc(c.key).set({items:i}).catch(e=>console.log('Firebase save error:',e))}}
 const dashSections=[{title:'Reports & Tools',items:[{name:'Dell Support Home',url:'https://www.dell.com/support/home/en-us'},{name:'Lockout Report',url:'https://trackit.dell.com/itops/lockout-report'},{name:'BSOD Tool',url:'https://trackit.dell.com/itops/bsod-tool'},{name:'MYIT Service Portal',url:'https://myit.dell.com'},{name:'Teams Card',url:'https://teams.microsoft.com'}]},{title:'Menu Hardware',items:[{name:'Hardware Troubleshooting',url:'https://www.dell.com/support/home/en-us/Products'},{name:'Tech Central Locations',url:'https://dell.sharepoint.com/sites/TechCentral'},{name:'Dispatch',url:'https://dell.sharepoint.com/sites/Dispatch'},{name:'Quality',url:'https://dell.sharepoint.com/sites/Quality'},{name:'SPMD',url:'https://dell.sharepoint.com/sites/SPMD'},{name:'Turbotech',url:'https://turbotech.dell.com'},{name:'Product Reference',url:'https://dell.sharepoint.com/sites/ProductReference'},{name:'Digital Tech Console',url:'https://dell.sharepoint.com/sites/DigitalTechConsole'},{name:'Tech Central Check-In',url:'https://dell.sharepoint.com/sites/TechCentralCheckIn'}]},{title:'Service Request',items:[{name:'VDI Request',url:'https://myit.dell.com/vdi-request'},{name:'Refresh PC Provisioning',url:'https://myit.dell.com/refresh-provisioning'},{name:'Refresh PC',url:'https://myit.dell.com/refresh-pc'},{name:'Standard Peripheral',url:'https://myit.dell.com/standard-peripheral'},{name:'PC Loaner & Swap',url:'https://myit.dell.com/pc-loaner'},{name:'Softphone Exception Request',url:'https://myit.dell.com/softphone-exception'},{name:'Asset Return Request',url:'https://myit.dell.com/asset-return'},{name:'Temporary Access Pass',url:'https://myit.dell.com/temp-access'}]},{title:'MY IT Article',items:getSavedItems('MY IT Article')},{title:'Self Help',items:[{name:'Microsoft 365 License Upgrade',url:'https://myit.dell.com/selfhelp/m365-license'},{name:'Dell IT Vulnerability Scanner',url:'https://myit.dell.com/selfhelp/vuln-scanner'},{name:"Dell IT Universal Uninstaller's",url:'https://myit.dell.com/selfhelp/universal-uninstaller'}]},{title:'MY IT Article - Self Healer',items:getSavedItems('MY IT Article - Self Healer')},{title:'MY IT Article - Knowledge',items:getSavedItems('MY IT Article - Knowledge')},{title:'MYIT Article - Resources',items:getSavedItems('MYIT Article - Resources')}];
 
 function renderDashboard(){const m=document.getElementById('dashboardContent');let h='<div class="dash-search"><input type="text" id="dashFilter" placeholder="Search all articles..." oninput="filterDashboard(this.value)"><div class="dash-search-info" id="dashFilterInfo"></div></div><div class="col-grid">';dashSections.forEach((s,si)=>{const cfg=addableColumns[s.title];const canAdd=!!cfg;const defCount=canAdd?cfg.defaults.length:0;const hasMore=s.items.length>MAX_VISIBLE;h+='<div class="col-card" data-col-card="'+si+'"><div class="col-header">'+s.title+'<span class="col-count">'+s.items.length+'</span></div><ul class="col-list">';s.items.forEach((i,idx)=>{const u=i.url.replace(/'/g,'&#39;');const hidden=(hasMore&&idx>=MAX_VISIBLE)?' hidden-item':'';h+='<li class="col-item'+hidden+'" data-col="'+si+'" data-name="'+i.name.toLowerCase()+'"><a href="'+i.url+'" target="_blank">'+i.name+'</a>';if(canAdd&&idx>=defCount)h+='<button class="col-del" onclick="event.stopPropagation();removeArticle(\''+s.title+'\','+idx+')" title="Remove">'+delSvg+'</button>';h+='<button class="col-copy" onclick="copyLink(\''+u+'\')" title="Copy link">'+copySvg+'</button></li>'});if(hasMore)h+='<li class="col-toggle" data-col-toggle="'+si+'"><button onclick="toggleColumn(this,'+si+')" data-expanded="false">Show '+(s.items.length-MAX_VISIBLE)+' more ▼</button></li>';if(canAdd)h+='<li class="col-add"><button onclick="openAddArticle(\''+s.title+'\')">+ Add Article</button></li>';h+='</ul></div>'});h+='</div>';m.innerHTML=h}
@@ -273,6 +278,18 @@ if(sec.items.some(a=>a.name.toLowerCase()===name.toLowerCase())){showToast('Arti
 sec.items.push({name,url});
 saveItems(t,sec.items);
 renderDashboard();
+// LOAD FROM FIREBASE
+(async function(){
+let updated=false;
+for(const title of Object.keys(addableColumns)){
+const cfg=addableColumns[title];
+try{const doc=await db.collection('articles').doc(cfg.key).get();
+if(doc.exists){const data=doc.data();
+if(data.items&&data.items.length>0){const sec=dashSections.find(s=>s.title===title);
+if(sec){sec.items=data.items;updated=true}}}}
+catch(e){console.log('Firebase load:',e)}}
+if(updated)renderDashboard();
+})();
 
 // Generate permanent code
 const safeName=name.replace(/'/g,"\\'");
