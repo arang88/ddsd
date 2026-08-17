@@ -299,14 +299,6 @@ if(updated)renderDashboard();
 }
 setTimeout(loadFirebase,1000);
 
-
-// Show code to copy
-nEl.value='';uEl.value='';
-document.getElementById('addArticleCode').style.display='block';
-document.getElementById('addArticleCodeText').textContent=codeLine;
-showToast('✅ Article added! Copy code below to make permanent');
-}
-
 function removeArticle(t,idx){const sec=dashSections.find(s=>s.title===t);const cfg=addableColumns[t];if(!sec||!cfg||idx<cfg.defaults.length)return;sec.items.splice(idx,1);saveItems(t,sec.items);renderDashboard();showToast('🗑️ Article removed')}
 function copyLink(u){const d=u.replace(/&#39;/g,"'");navigator.clipboard.writeText(d).then(()=>showToast('✅ Link copied!')).catch(()=>{const a=document.createElement('textarea');a.value=d;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);showToast('✅ Link copied!')})}
 
