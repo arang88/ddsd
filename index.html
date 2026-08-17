@@ -280,17 +280,22 @@ saveItems(t,sec.items);
 renderDashboard();
 document.getElementById('footerYear').textContent=new Date().getFullYear();
 // LOAD FROM FIREBASE
-(async function(){
+function loadFirebase(){
+db.collection('articles').get().then(function(snapshot){
 let updated=false;
+snapshot.forEach(function(doc){
+const data=doc.data();
+const docId=doc.id;
 for(const title of Object.keys(addableColumns)){
 const cfg=addableColumns[title];
-try{const doc=await db.collection('articles').doc(cfg.key).get();
-if(doc.exists){const data=doc.data();
-if(data.items&&data.items.length>0){const sec=dashSections.find(s=>s.title===title);
-if(sec){sec.items=data.items;updated=true}}}}
-catch(e){console.log('Firebase load:',e)}}
+if(cfg.key===docId&&data.items&&data.items.length>0){
+const sec=dashSections.find(s=>s.title===title);
+if(sec){sec.items=data.items;updated=true}
+}}});
 if(updated)renderDashboard();
-})();
+}).catch(function(e){console.log('Firebase load error:',e)});
+}
+loadFirebase();
 
 // Generate permanent code
 const safeName=name.replace(/'/g,"\\'");
