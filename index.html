@@ -278,6 +278,7 @@ if(sec.items.some(a=>a.name.toLowerCase()===name.toLowerCase())){showToast('Arti
 sec.items.push({name,url});
 saveItems(t,sec.items);
 renderDashboard();
+document.getElementById('footerYear').textContent=new Date().getFullYear();
 // LOAD FROM FIREBASE
 (async function(){
 let updated=false;
