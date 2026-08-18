@@ -97,7 +97,7 @@ main{max-width:1440px;margin:0 auto;padding:80px 24px 48px}
 
 <div class="modal-overlay" id="modal-addArticle" onclick="closeModalOutside(event)"><div class="modal" style="max-width:480px"><div class="modal-header"><h3>Add Article</h3><button class="modal-close" onclick="closeModal('addArticle')">&times;</button></div><div class="modal-body"><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:14px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm)">Adding to: <strong style="color:var(--accent)" id="addArticleTarget"></strong></div><div class="tool-group"><div class="tool-label">Article Name</div><input type="text" class="tool-input" id="addArticleName" placeholder="e.g. How to Reset VPN Settings"></div><div class="tool-group"><div class="tool-label">Article URL</div><input type="text" class="tool-input" id="addArticleUrl" placeholder="e.g. https://myit.dell.com/article/..."></div><button class="tool-btn primary" onclick="addArticle()" style="width:100%">Add Article</button></div></div></div>
 
-<div class="modal-overlay" id="modal-editLink" onclick="closeModalOutside(event)"><div class="modal" style="max-width:480px"><div class="modal-header"><h3>Edit Link</h3><button class="modal-close" onclick="closeModal('editLink')">&times;</button></div><div class="modal-body"><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:14px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm)">Editing: <strong style="color:var(--accent)" id="editLinkName"></strong></div><div class="tool-group"><div class="tool-label">New URL</div><input type="text" class="tool-input" id="editLinkUrl" placeholder="Paste new URL here..."></div><button class="tool-btn primary" onclick="saveLinkEdit()" style="width:100%">Save URL</button></div></div></div>
+<div class="modal-overlay" id="modal-editLink" onclick="closeModalOutside(event)"><div class="modal" style="max-width:480px"><div class="modal-header"><h3>Edit Link</h3><button class="modal-close" onclick="closeModal('editLink')">&times;</button></div><div class="modal-body"><div style="font-size:.78rem;color:var(--text-muted);margin-bottom:14px;padding:8px 12px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm)">Section: <strong style="color:var(--accent)" id="editLinkSection"></strong></div><div class="tool-group"><div class="tool-label">Title</div><input type="text" class="tool-input" id="editLinkName" placeholder="Article title..."></div><div class="tool-group"><div class="tool-label">URL</div><input type="text" class="tool-input" id="editLinkUrl" placeholder="Paste URL here..."></div><button class="tool-btn primary" onclick="saveLinkEdit()" style="width:100%">Save Changes</button></div></div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -113,18 +113,24 @@ var editSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 var MAX_VISIBLE=6;
 
 // ADDABLE COLUMNS CONFIG
-var addableColumns={'MY IT Article':{key:'myitArticles',defaults:[{name:'Lost or Stolen PC Assets',url:'https://myit.dell.com/article/lost-stolen'},{name:'BeyondTrust Privilege Management',url:'https://myit.dell.com/article/beyondtrust'},{name:'Escalate an Incident via My IT',url:'https://myit.dell.com/article/escalate-incident'},{name:'Contact IT',url:'https://myit.dell.com/article/contact-it'},{name:'IT Service Desk - Worldwide Phone Contact',url:'https://myit.dell.com/article/worldwide-phone'},{name:'Working from Home: Evaluate your Network Status',url:'https://myit.dell.com/article/wfh-network'}]},'MY IT Article - Self Healer':{key:'selfHealerArticles',defaults:[{name:'Self Healer',url:'https://myit.dell.com/article/self-healer'},{name:'SHIR - Reimage',url:'https://myit.dell.com/article/shir-reimage'}]},'MY IT Article - Knowledge':{key:'knowledgeArticles',defaults:[{name:'Additional Knowledge Articles',url:'https://myit.dell.com/article/additional-knowledge'}]},'MYIT Article - Resources':{key:'resourceArticles',defaults:[{name:'Additional Resources',url:'https://myit.dell.com/article/additional-resources'}]}};
-
+var addableColumns={
+'Reports & Tools':{key:'reportsArticles',defaults:[{name:'Dell Support Home',url:'https://www.dell.com/support/home/en-us'},{name:'Lockout Report',url:'https://trackit.dell.com/itops/lockout-report'},{name:'BSOD Tool',url:'https://trackit.dell.com/itops/bsod-tool'},{name:'MYIT Service Portal',url:'https://myit.dell.com'},{name:'Teams Card',url:'https://teams.microsoft.com'}]},
+'Service Request':{key:'serviceArticles',defaults:[{name:'VDI Request',url:'https://myit.dell.com/vdi-request'},{name:'Refresh PC Provisioning',url:'https://myit.dell.com/refresh-provisioning'},{name:'Refresh PC',url:'https://myit.dell.com/refresh-pc'},{name:'Standard Peripheral',url:'https://myit.dell.com/standard-peripheral'},{name:'PC Loaner & Swap',url:'https://myit.dell.com/pc-loaner'},{name:'Softphone Exception Request',url:'https://myit.dell.com/softphone-exception'},{name:'Asset Return Request',url:'https://myit.dell.com/asset-return'},{name:'Temporary Access Pass',url:'https://myit.dell.com/temp-access'}]},
+'Self Help':{key:'selfHelpArticles',defaults:[{name:'Microsoft 365 License Upgrade',url:'https://myit.dell.com/selfhelp/m365-license'},{name:'Dell IT Vulnerability Scanner',url:'https://myit.dell.com/selfhelp/vuln-scanner'},{name:"Dell IT Universal Uninstaller's",url:'https://myit.dell.com/selfhelp/universal-uninstaller'}]},
+'MY IT Article':{key:'myitArticles',defaults:[{name:'Lost or Stolen PC Assets',url:'https://myit.dell.com/article/lost-stolen'},{name:'BeyondTrust Privilege Management',url:'https://myit.dell.com/article/beyondtrust'},{name:'Escalate an Incident via My IT',url:'https://myit.dell.com/article/escalate-incident'},{name:'Contact IT',url:'https://myit.dell.com/article/contact-it'},{name:'IT Service Desk - Worldwide Phone Contact',url:'https://myit.dell.com/article/worldwide-phone'},{name:'Working from Home: Evaluate your Network Status',url:'https://myit.dell.com/article/wfh-network'}]},
+'MY IT Article - Self Healer':{key:'selfHealerArticles',defaults:[{name:'Self Healer',url:'https://myit.dell.com/article/self-healer'},{name:'SHIR - Reimage',url:'https://myit.dell.com/article/shir-reimage'}]},
+'MY IT Article - Knowledge':{key:'knowledgeArticles',defaults:[{name:'Additional Knowledge Articles',url:'https://myit.dell.com/article/additional-knowledge'}]},
+'MYIT Article - Resources':{key:'resourceArticles',defaults:[{name:'Additional Resources',url:'https://myit.dell.com/article/additional-resources'}]}
+};
 function getSavedItems(t){var c=addableColumns[t];if(!c)return null;var s=localStorage.getItem(c.key);if(s){try{return JSON.parse(s)}catch(e){}}return JSON.parse(JSON.stringify(c.defaults))}
 function saveItems(t,i){var c=addableColumns[t];if(c){localStorage.setItem(c.key,JSON.stringify(i));db.collection('articles').doc(c.key).set({items:i}).catch(function(e){console.log('Firebase save error:',e)})}}
-
 // DASHBOARD SECTIONS
 var dashSections=[
-{title:'Reports & Tools',items:[{name:'Dell Support Home',url:'https://www.dell.com/support/home/en-us'},{name:'Lockout Report',url:'https://trackit.dell.com/itops/lockout-report'},{name:'BSOD Tool',url:'https://trackit.dell.com/itops/bsod-tool'},{name:'MYIT Service Portal',url:'https://myit.dell.com'},{name:'Teams Card',url:'https://teams.microsoft.com'}]},
+{title:'Reports & Tools',items:getSavedItems('Reports & Tools')},
 {title:'Menu Hardware',items:[{name:'Hardware Troubleshooting',url:'https://www.dell.com/support/home/en-us/Products'},{name:'Tech Central Locations',url:'https://dell.sharepoint.com/sites/TechCentral'},{name:'Dispatch',url:'https://dell.sharepoint.com/sites/Dispatch'},{name:'Quality',url:'https://dell.sharepoint.com/sites/Quality'},{name:'SPMD',url:'https://dell.sharepoint.com/sites/SPMD'},{name:'Turbotech',url:'https://turbotech.dell.com'},{name:'Product Reference',url:'https://dell.sharepoint.com/sites/ProductReference'},{name:'Digital Tech Console',url:'https://dell.sharepoint.com/sites/DigitalTechConsole'},{name:'Tech Central Check-In',url:'https://dell.sharepoint.com/sites/TechCentralCheckIn'}]},
-{title:'Service Request',items:[{name:'VDI Request',url:'https://myit.dell.com/vdi-request'},{name:'Refresh PC Provisioning',url:'https://myit.dell.com/refresh-provisioning'},{name:'Refresh PC',url:'https://myit.dell.com/refresh-pc'},{name:'Standard Peripheral',url:'https://myit.dell.com/standard-peripheral'},{name:'PC Loaner & Swap',url:'https://myit.dell.com/pc-loaner'},{name:'Softphone Exception Request',url:'https://myit.dell.com/softphone-exception'},{name:'Asset Return Request',url:'https://myit.dell.com/asset-return'},{name:'Temporary Access Pass',url:'https://myit.dell.com/temp-access'}]},
+{title:'Service Request',items:getSavedItems('Service Request')},
 {title:'MY IT Article',items:getSavedItems('MY IT Article')},
-{title:'Self Help',items:[{name:'Microsoft 365 License Upgrade',url:'https://myit.dell.com/selfhelp/m365-license'},{name:'Dell IT Vulnerability Scanner',url:'https://myit.dell.com/selfhelp/vuln-scanner'},{name:"Dell IT Universal Uninstaller's",url:'https://myit.dell.com/selfhelp/universal-uninstaller'}]},
+{title:'Self Help',items:getSavedItems('Self Help')},
 {title:'MY IT Article - Self Healer',items:getSavedItems('MY IT Article - Self Healer')},
 {title:'MY IT Article - Knowledge',items:getSavedItems('MY IT Article - Knowledge')},
 {title:'MYIT Article - Resources',items:getSavedItems('MYIT Article - Resources')}
@@ -207,25 +213,30 @@ var sec=dashSections.find(function(s){return s.title===sectionTitle});
 if(!sec||!sec.items[idx])return;
 var item=sec.items[idx];
 window._editTarget={section:sectionTitle,idx:idx};
-document.getElementById('editLinkName').textContent=item.name;
+document.getElementById('editLinkSection').textContent=sectionTitle;
+document.getElementById('editLinkName').value=item.name;
 document.getElementById('editLinkUrl').value=item.url;
 openModal('editLink');
-setTimeout(function(){document.getElementById('editLinkUrl').select()},150);
+setTimeout(function(){document.getElementById('editLinkName').focus()},150);
 }
 function saveLinkEdit(){
+var nameEl=document.getElementById('editLinkName');
 var urlEl=document.getElementById('editLinkUrl');
+var newName=nameEl.value.trim();
 var newUrl=urlEl.value.trim();
+if(!newName){showToast('Enter title');nameEl.focus();return}
 if(!newUrl){showToast('Enter URL');urlEl.focus();return}
 var target=window._editTarget;
 var sec=dashSections.find(function(s){return s.title===target.section});
 if(!sec)return;
+sec.items[target.idx].name=newName;
 sec.items[target.idx].url=newUrl;
 var cfg=addableColumns[target.section];
 if(cfg){saveItems(target.section,sec.items)}
 else{db.collection('linkOverrides').doc(target.section).set({items:sec.items}).catch(function(e){console.log('Save error:',e)})}
 renderDashboard();
 closeModal('editLink');
-showToast('✅ URL updated!');
+showToast('✅ Updated!');
 }
 
 // COPY LINK
