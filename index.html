@@ -122,7 +122,7 @@ var addableColumns={
 'MY IT Article - Knowledge':{key:'knowledgeArticles',defaults:[{name:'Additional Knowledge Articles',url:'https://myit.dell.com/article/additional-knowledge'}]},
 'MYIT Article - Resources':{key:'resourceArticles',defaults:[{name:'Additional Resources',url:'https://myit.dell.com/article/additional-resources'}]}
 };
-function getSavedItems(t){var c=addableColumns[t];if(!c)return null;var s=localStorage.getItem(c.key);if(s){try{return JSON.parse(s)}catch(e){}}return JSON.parse(JSON.stringify(c.defaults))}
+function getSavedItems(t){var c=addableColumns[t];if(!c)return [];var s=localStorage.getItem(c.key);if(s){try{return JSON.parse(s)}catch(e){}}return JSON.parse(JSON.stringify(c.defaults))}
 function saveItems(t,i){var c=addableColumns[t];if(c){localStorage.setItem(c.key,JSON.stringify(i));db.collection('articles').doc(c.key).set({items:i}).catch(function(e){console.log('Firebase save error:',e)})}}
 // DASHBOARD SECTIONS
 var dashSections=[
@@ -131,7 +131,7 @@ var dashSections=[
 {title:'Service Request',items:getSavedItems('Service Request')},
 {title:'MY IT Article',items:getSavedItems('MY IT Article')},
 {title:'Self Help',items:getSavedItems('Self Help')},
-{title:'MY IT Article - Self Healer',items:getSavedItems('MY IT Article - Self Healer')},
+{title:'MY IT Article',items:getSavedItems('MY IT Article')},
 {title:'MY IT Article - Knowledge',items:getSavedItems('MY IT Article - Knowledge')},
 {title:'MYIT Article - Resources',items:getSavedItems('MYIT Article - Resources')}
 ];
